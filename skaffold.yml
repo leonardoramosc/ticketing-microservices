@@ -1,0 +1,64 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false # do not push to docker hub on rebuild
+  artifacts:
+    - image: leonardoramosc/ticketing-auth
+      context: auth # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: leonardoramosc/ticketing-client
+      context: client # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
+    - image: leonardoramosc/ticketing-tickets
+      context: tickets # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: leonardoramosc/ticketing-orders
+      context: orders # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: leonardoramosc/ticketing-expiration
+      context: expiration # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: leonardoramosc/ticketing-payments
+      context: payments # the folder that contains the project files
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+profiles:
+  - name: nats
+    deploy:
+      kubectl:
+        manifests:
+          - ./infra/k8s/nats-depl.yaml

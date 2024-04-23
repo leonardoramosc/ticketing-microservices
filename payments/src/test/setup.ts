@@ -12,7 +12,7 @@ declare global {
 let mongo: MongoMemoryServer;
 beforeAll(async () => {
   process.env.JWT_KEY = "12345";
-  const mongo = await MongoMemoryServer.create();
+  mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
 
   await mongoose.connect(mongoUri, {});

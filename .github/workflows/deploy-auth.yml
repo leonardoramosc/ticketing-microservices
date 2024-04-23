@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: DOCKER
     steps:
       - uses: actions/checkout@v2
       - run: cd auth && docker build -t leonardoramosc/ticketing-auth .

@@ -7,7 +7,7 @@ const buildClient = ({ req }) => {
     const k8sServiceName = 'ingress-nginx-controller'
     const k8sNamespace = 'ingress-nginx'
     return axios.create({
-      baseURL: `http://${k8sServiceName}.${k8sNamespace}.svc.cluster.local`,
+      baseURL: `http://www.ticketing-app-course.lol`,
       headers: req.headers
     });
   } else {

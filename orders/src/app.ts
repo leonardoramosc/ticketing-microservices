@@ -18,16 +18,16 @@ app.use(json());
 app.use(
   cookieSession({
     signed: false, // disable encryption (this is because if we consume this service using another language that language might not support it)
-    secure: process.env.NODE_ENV !== "test", // set cookies only in https (unless we are in the test environment which will always be http)
+    secure: false, //process.env.NODE_ENV !== "test", // set cookies only in https (unless we are in the test environment which will always be http)
   })
 );
 
-app.use(currentUser)
+app.use(currentUser);
 
 app.use(createOrderRouter);
 app.use(showOrderRouter);
 app.use(indexOrderRouter);
-app.use(deleteOrderRouter)
+app.use(deleteOrderRouter);
 
 app.all("*", async () => {
   throw new NotFoundError();

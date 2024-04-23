@@ -1,0 +1,23 @@
+name: deploy-orders
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'orders/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: DOCKER
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd orders && docker build -t leonardoramosc/ticketing-orders .
+      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - run: docker push leonardoramosc/ticketing-orders
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITAL_OCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment orders-depl # instruct k8s cluster to use latest image pushed to dockerhub

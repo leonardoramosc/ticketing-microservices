@@ -1,0 +1,23 @@
+name: deploy-expiration
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'expiration/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: DOCKER
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd expiration && docker build -t leonardoramosc/ticketing-expiration .
+      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - run: docker push leonardoramosc/ticketing-expiration
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITAL_OCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment expiration-depl # instruct k8s cluster to use latest image pushed to dockerhub

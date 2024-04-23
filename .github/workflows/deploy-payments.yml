@@ -1,0 +1,23 @@
+name: deploy-payments
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'payments/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: DOCKER
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd payments && docker build -t leonardoramosc/ticketing-payments .
+      - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - run: docker push leonardoramosc/ticketing-payments
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITAL_OCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment payments-depl # instruct k8s cluster to use latest image pushed to dockerhub
